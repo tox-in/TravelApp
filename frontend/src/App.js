@@ -1,7 +1,7 @@
 import "./app.css";
 import ReactMapGL, { Marker, Popup } from "react-map-gl";
 import { useEffect, useState } from "react";
-import { Room, Star, StarBorder } from "@material-ui/icons";
+import { Room, Star } from "@material-ui/icons";
 import axios from "axios";
 import { format } from "timeago.js";
 import Register from "./components/Register";
@@ -13,13 +13,15 @@ function App() {
   const [pins, setPins] = useState([]);
   const [currentPlaceId, setCurrentPlaceId] = useState(null);
   const [newPlace, setNewPlace] = useState(null);
-  const [title, setTitle] = useState(null);
-  const [desc, setDesc] = useState(null);
+  const [title, setTitle] = useState("");
+  const [desc, setDesc] = useState("");
   const [star, setStar] = useState(0);
   const [viewport, setViewport] = useState({
     latitude: 47.040182,
     longitude: 17.071727,
     zoom: 4,
+    width: "100%",
+    height: "100%",
   });
   const [showRegister, setShowRegister] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
@@ -78,16 +80,13 @@ function App() {
     <div style={{ height: "100vh", width: "100%" }}>
       <ReactMapGL
         {...viewport}
-        mapboxApiAccessToken=""
-        width="100%"
-        height="100%"
-        transitionDuration="200"
-        mapStyle="mapbox://styles/safak/cknndpyfq268f17p53nmpwira"
-        onViewportChange={(viewport) => setViewport(viewport)}
+        mapboxApiAccessToken="YOUR_MAPBOX_TOKEN"
+        mapStyle="mapbox://styles/mapbox/streets-v11"
+        onViewportChange={(nextViewport) => setViewport(nextViewport)}
         onDblClick={currentUsername && handleAddClick}
       >
         {pins.map((p) => (
-          <>
+          <div key={p._id}>
             <Marker
               latitude={p.lat}
               longitude={p.long}
@@ -97,8 +96,7 @@ function App() {
               <Room
                 style={{
                   fontSize: 7 * viewport.zoom,
-                  color:
-                    currentUsername === p.username ? "tomato" : "slateblue",
+                  color: currentUsername === p.username ? "tomato" : "slateblue",
                   cursor: "pointer",
                 }}
                 onClick={() => handleMarkerClick(p._id, p.lat, p.long)}
@@ -106,7 +104,6 @@ function App() {
             </Marker>
             {p._id === currentPlaceId && (
               <Popup
-                key={p._id}
                 latitude={p.lat}
                 longitude={p.long}
                 closeButton={true}
@@ -131,7 +128,7 @@ function App() {
                 </div>
               </Popup>
             )}
-          </>
+          </div>
         ))}
         {newPlace && (
           <>
@@ -167,7 +164,7 @@ function App() {
                   />
                   <label>Description</label>
                   <textarea
-                    placeholder="Say us something about this place."
+                    placeholder="Say something about this place."
                     onChange={(e) => setDesc(e.target.value)}
                   />
                   <label>Rating</label>

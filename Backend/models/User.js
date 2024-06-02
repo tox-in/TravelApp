@@ -1,27 +1,37 @@
-const mongoose = require("mongoose");
+const { parseSync } = require('@babel/core');
+const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
 
-const UserSchema = new mongoose.Schema(
-    {
-        username: {
-            type: String,
-            required: true,
-            min: 3,
-            max: 20,
-            unique: true
-        },
-        email: {
-            type: String,
-            required: true,
-            max: 50,
-            unique: true
-        },
-        password: {
-            type: String,
-            required: true,
-            min: 6,
-        },
+const Schema = mongoose.Schema;
+
+const userSchema = new Schema({
+    name: {
+        type: String,
+        required: true
     },
-    { timestamps: true }
-);
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true,
+        minlength: 8
+    },
+    image: {
+        type: String,
+        required: true
+    },
+    places: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+            ref: 'Place'
+        }
+    ]
+});
 
-module.exports = mongoose.model("User", UserSchema);
+userSchema.plugin(uniqueValidator);
+
+module.exports = mongoose.model('User', userSchema);
