@@ -63,42 +63,44 @@ const signUp = async (req, res, next) => {
       {
         folder: "travel",
       },
-      async function (error, result) {
-        if (result.url) {
+      function (error, result) {
+        if (error) {
+          console.error("Error uploading avatar:", error);
+          return res
+            .status(500)
+            .json({ success: false, message: "Failed to upload avatar" });
+        }
+
+        if (result && result.url) {
           const imageUrl = result.url;
 
           console.log(name, email, hashedPassword, imageUrl);
 
-          try {
-            User.create({
-              name,
-              email,
-              password: hashedPassword,
-              image: imageUrl,
-              places: [],
-            }).then((user) => {
+          User.create({
+            name,
+            email,
+            password: hashedPassword,
+            image: imageUrl,
+            places: [],
+          })
+            .then((user) => {
+              const token = generateToken(user.id);
               res.status(201).json({
                 userId: user.id,
                 email: user.email,
                 token: token,
                 image: user.image,
+                name: user.name,
               });
-            }).catch((error) => {
+            })
+            .catch((error) => {
               return next(
-                new HttpError("Could not create a user. Please try again 1.", 500)
+                new HttpError("Could not create a user. Please try again.", 500)
               );
             });
-          } catch (error) {
-            console.error("Error creating user:", error);
-            return next(
-              new HttpError("Could not create a user. Please try again.", 500)
-            );
-          }          
-        }
-
-        if (error) {
-          console.error("Error uploading avatar:", error);
-          res
+        } else {
+          console.error("Upload result is missing the URL.");
+          return res
             .status(500)
             .json({ success: false, message: "Failed to upload avatar" });
         }
@@ -153,7 +155,7 @@ const logIn = async (req, res, next) => {
     return next(new HttpError("Logging in failed. Please correct.", 500));
   }
 
-  res.status(200).json({ userId: user.id, email: user.email, token: token });
+  res.status(200).json({ userId: user.id, email: user.email, token: token, name: user.name });
 };
 
 exports.getUsers = getUsers;
