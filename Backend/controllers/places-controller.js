@@ -112,5 +112,113 @@ const updatePlace = async (req, res, next) => {
     }
 
     const { title, description } = req.body;
-    const placeId = req.params
-}
+    const placeId = req.params.placeId;
+    let place;
+
+    try {
+        place = await Place.findById(placeId);
+    } catch (err) {
+        return next(
+            new HttpError(
+                'Something went wrong, could not update place.',
+                500
+            )
+        );
+    }
+
+    if(place.creator.toString() !== req.userData.userId) {
+        return next(
+            new HttpError(
+                "Not authorized to update this place.",
+                401
+            )
+        );
+    }
+
+    place.title = title;
+    place.description = description;
+
+    try {
+        await place.save();
+    } catch (err) {
+        return next(
+            new HttpError(
+                'Something went wrong, could not update place.',
+                500
+            )
+        );
+    }
+
+    res.status(200).json({ place: place.toObject({ getters: true }) });
+};
+
+const deletePlace = async (req, res, next) => {
+    const placeId = req.params.placeId;
+    let place;
+
+    try {
+        place = await Place.findById(placeId).populate('creator');
+    } catch (error) {
+        return next(
+            new HttpError(
+                'Couldn\'t find the place',
+                500
+            )
+        );
+    }
+
+    if(!place) {
+        return next (
+            new HttpError(
+                'Could not find the place for this id',
+                404
+            )
+        );
+    }
+
+    if(place.creator.id !== req.userData.userId) {
+        return next(
+            new HttpError(
+                'You are not authorized to delete this place.',
+                401
+            )
+        );
+    }
+
+    const imagePath = place.image;
+
+    try {
+        const sess = await mongoose.startSession();
+
+        sess.startTransaction();
+        await place.remove({ session: sess });
+        place.creator.places.pull(place);
+        await place.creator.save({ session: sess });
+        await sess.commitTransaction();
+    } catch (err) {
+        return next(
+            new HttpError(
+                'An error occurred',
+                500
+            )
+        );
+    }
+
+    const publicId = imagePath.split('/').pop().split('.')[0];
+    cloudinary.uploader.destroy(publicId, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+    });
+
+    res.status(200).send({
+        message:
+        'Place deleted.'
+    });
+};
+
+exports.getPlaceById = getPlaceById;
+exports.getPlacesByUserId = getPlacesByUserId;
+exports.createPlace = createPlace;
+exports.updatePlace = updatePlace;
+exports.deletePlace = deletePlace;
