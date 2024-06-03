@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import './PlaceForm.css';
 import Button from '../../shared/components/FormElements/Button';
@@ -45,7 +45,7 @@ const NewPlace = () => {
     false
   );
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const placeSubmitHandler = async event => {
     event.preventDefault();
@@ -54,10 +54,7 @@ const NewPlace = () => {
       const formData = new FormData();
 
       formData.append('title', formState.inputs.title.value);
-      formData.append(
-        'description',
-        formState.inputs.description.value
-      );
+      formData.append('description', formState.inputs.description.value);
       formData.append('address', formState.inputs.address.value);
       formData.append('image', formState.inputs.image.value);
 
@@ -68,7 +65,7 @@ const NewPlace = () => {
         { Authorization: `Bearer ${auth.token}` }
       );
 
-      history.push('/');
+      navigate('/');
     } catch (err) {}
   };
 

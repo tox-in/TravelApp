@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import './PlaceForm.css';
 import Input from '../../shared/components/FormElements/Input';
@@ -25,7 +25,7 @@ const UpdatePlace = () => {
   } = useHttpClient();
   const [loadedPlace, setLoadedPlace] = useState();
   const placeId = useParams().placeId;
-  const history = useHistory();
+  const navigate = useNavigate();
   const [formState, inputHandler, setFormData] = useForm(
     {
       title: {
@@ -83,7 +83,7 @@ const UpdatePlace = () => {
           Authorization: `Bearer ${auth.token}`
         }
       );
-      history.push(`/${auth.userId}/places`);
+      navigate(`/${auth.userId}/places`);
     } catch (err) {}
   };
 

@@ -2,8 +2,8 @@ import React, { Suspense } from 'react';
 import {
   BrowserRouter as Router,
   Route,
-  Redirect,
-  Switch
+  Routes,
+  Navigate
 } from 'react-router-dom';
 
 import MainNavigation from './shared/components/Navigation/MainNavigation';
@@ -28,36 +28,22 @@ const App = () => {
 
   if (token) {
     routes = (
-      <Switch>
-        <Route path="/" exact>
-          <Users />
-        </Route>
-        <Route path="/:userId/places" exact>
-          <UserPlaces></UserPlaces>
-        </Route>
-        <Route path="/places/new" exact>
-          <NewPlace />
-        </Route>
-        <Route path="/places/:placeId">
-          <UpdatePlace></UpdatePlace>
-        </Route>
-        <Redirect to="/"></Redirect>
-      </Switch>
+      <Routes>
+        <Route path="/" element={<Users />} />
+        <Route path="/:userId/places" element={<UserPlaces />} />
+        <Route path="/places/new" element={<NewPlace />} />
+        <Route path="/places/:placeId" element={<UpdatePlace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     );
   } else {
     routes = (
-      <Switch>
-        <Route path="/" exact>
-          <Users />
-        </Route>
-        <Route path="/:userId/places" exact>
-          <UserPlaces></UserPlaces>
-        </Route>
-        <Route path="/auth">
-          <Auth></Auth>
-        </Route>
-        <Redirect to="/auth"></Redirect>
-      </Switch>
+      <Routes>
+        <Route path="/" element={<Users />} />
+        <Route path="/:userId/places" element={<UserPlaces />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="*" element={<Navigate to="/auth" replace />} />
+      </Routes>
     );
   }
 
@@ -72,12 +58,12 @@ const App = () => {
       }}
     >
       <Router>
-        <MainNavigation></MainNavigation>
+        <MainNavigation />
         <main>
           <Suspense
             fallback={
               <div className="center">
-                <LoadingSpinner></LoadingSpinner>
+                <LoadingSpinner />
               </div>
             }
           >
