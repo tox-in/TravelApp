@@ -1,41 +1,26 @@
 const express = require('express');
 const { check } = require('express-validator');
 
-const placesControllers = require('../controllers/places-controller');
-const fileUpload = require('../middleware/file-upload'); // Corrected path
-const checkAuth = require('../middleware/check-auth');
+const usersController = require('./../controllers/users-controller');
+const fileUpload = require('./../middleware/file-upload');
 
 const router = express.Router();
 
-// Public routes
-router.get('/:placeId', placesControllers.getPlaceById);
-
-router.get('/user/:userId', placesControllers.getPlacesByUserId);
-
-// Authentication middleware
-router.use(checkAuth);
-
-// Authenticated routes
+router.get('/', usersController.getUsers);
 router.post(
-  '/',
+  '/signup',
   fileUpload.single('image'),
   [
-    check('title').not().isEmpty(),
-    check('description').isLength({ min: 5 }),
-    check('address').not().isEmpty()
+    check('name')
+      .not()
+      .isEmpty(),
+    check('email')
+      .normalizeEmail()
+      .isEmail(),
+    check('password').isLength({ min: 8 })
   ],
-  placesControllers.createPlace
+  usersController.signUp
 );
-
-router.patch(
-  '/:placeId',
-  [
-    check('title').not().isEmpty(),
-    check('description').isLength({ min: 5 })
-  ],
-  placesControllers.updatePlace
-);
-
-router.delete('/:placeId', placesControllers.deletePlace);
+router.post('/login', usersController.logIn);
 
 module.exports = router;
