@@ -21,11 +21,11 @@ const placeSchema = new Schema({
     location: {
         lat: {
             type: Number,
-            required: true
+            required: false
         },
         lng: {
             type: Number,
-            required: true
+            required: false
         }
     },
     creator: {

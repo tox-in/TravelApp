@@ -1,40 +1,30 @@
 const express = require('express');
 const { check } = require('express-validator');
+const multer = require("multer");
 
-const placesControllers = require('../controllers/places-controller');
-const checkAuth = require('../middleware/check-auth');
+const placesControllers = require("../controllers/places-controller");
+const checkAuth = require("../middleware/check-auth");
 
 const router = express.Router();
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-// Public routes
-router.get('/:placeId', placesControllers.getPlaceById);
+const uploadImage = upload.single("image");
 
-router.get('/user/:userId', placesControllers.getPlacesByUserId);
+router.get("/:placeId", placesControllers.getPlaceById);
 
-// Authentication middleware
+router.get("/user/:userId", placesControllers.getPlacesByUserId);
+
 router.use(checkAuth);
 
-// Authenticated routes
-// router.post(
-//   '/',
-//   fileUpload.single('image'),
-//   [
-//     check('title').not().isEmpty(),
-//     check('description').isLength({ min: 5 }),
-//     check('address').not().isEmpty()
-//   ],
-//   placesControllers.createPlace
-// );
+router.post("/newPlace", uploadImage, placesControllers.createPlace);
 
 router.patch(
-  '/:placeId',
-  [
-    check('title').not().isEmpty(),
-    check('description').isLength({ min: 5 })
-  ],
+  "/:placeId",
+  [check("title").not().isEmpty(), check("description").isLength({ min: 5 })],
   placesControllers.updatePlace
 );
 
-router.delete('/:placeId', placesControllers.deletePlace);
+router.delete("/:placeId", placesControllers.deletePlace);
 
 module.exports = router;

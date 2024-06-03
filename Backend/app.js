@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
-//app.use('/api/places', placesRoutes);
+app.use('/api/places', placesRoutes);
 app.use("/api/users", userRoutes);
 
 // Handle unknown routes
