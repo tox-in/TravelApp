@@ -7,7 +7,7 @@ import SideDrawer from './SideDrawer';
 import BackDrop from './../UIElements/Backdrop';
 import './MainNavigation.css';
 
-const MainNavigation = props => {
+const MainNavigation = (props) => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
 
   const openDrawerHandler = () => {
@@ -20,12 +20,10 @@ const MainNavigation = props => {
 
   return (
     <React.Fragment>
-      {drawerIsOpen && (
-        <BackDrop onClick={closeDrawerHandler}></BackDrop>
-      )}
+      {drawerIsOpen && <BackDrop onClick={closeDrawerHandler} />}
       <SideDrawer show={drawerIsOpen} onClick={closeDrawerHandler}>
         <nav className="main-navigation__drawer-nav">
-          <NavLinks></NavLinks>
+          <NavLinks />
         </nav>
       </SideDrawer>
 
@@ -33,6 +31,7 @@ const MainNavigation = props => {
         <button
           className="main-navigation__menu-btn"
           onClick={openDrawerHandler}
+          aria-label="Open navigation menu"
         >
           <span />
           <span />
@@ -42,7 +41,7 @@ const MainNavigation = props => {
           <Link to="/">YourPlaces</Link>
         </h1>
         <nav>
-          <NavLinks></NavLinks>
+          <NavLinks />
         </nav>
       </MainHeader>
     </React.Fragment>
